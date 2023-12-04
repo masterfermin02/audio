@@ -1,6 +1,6 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Masterfermin02\Audio\Tests;
 
 use PHPUnit\Framework\TestCase;
 

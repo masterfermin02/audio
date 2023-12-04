@@ -1,16 +1,16 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "masterfermin02/audio",
+    "description": "Extracts attributes of audio-files & Visualization",
     "keywords": [
-        ":vendor_name",
-        ":package_slug"
+        "masterfermin02",
+        "audio"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/masterfermin02/audio",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Fermin",
+            "email": "masterfermin02@gmail.com",
             "role": "Developer"
         }
     ],
@@ -19,16 +19,17 @@
     },
     "require-dev": {
         "laravel/pint": "^1.2",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^9",
+        "rector/rector": "^0.18.12"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src"
+            "Masterfermin02\\Audio\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Masterfermin02\\Audio\\Tests\\": "tests"
         }
     },
     "scripts": {

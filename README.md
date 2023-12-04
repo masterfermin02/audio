@@ -1,32 +1,26 @@
-# :package_description
+# Extracts attributes of audio-files & Visualization
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-[![Tests](https://github.com/:vendor_slug/:package_slug/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/:vendor_slug/:package_slug/actions/workflows/run-tests.yml)
-[![Total Downloads](https://img.shields.io/packagist/dt/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-<!--delete-->
----
-This package can be used as to scaffold a framework agnostic package. Follow these steps to get started:
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/masterfermin02/audio.svg?style=flat-square)](https://packagist.org/packages/masterfermin02/audio)
+[![Tests](https://github.com/masterfermin02/audio/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/masterfermin02/audio/actions/workflows/run-tests.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/masterfermin02/audio.svg?style=flat-square)](https://packagist.org/packages/masterfermin02/audio)
 
-1. Press the "Use template" button at the top of this repo to create a new repo with the contents of this skeleton
-2. Run "php ./configure.php" to run a script that will replace all placeholders throughout all the files
-3. Have fun creating your package.
----
-<!--/delete-->
-This is where your description should go. Try and limit it to a paragraph or two. Consider adding a small example.
+This class was basically built to recognize attributes (like frequency, format, channels, resolution, compression, length, id3-tags) of audio-files (.wav,.aif,.mp3,.ogg at the moment). Furthermore the latest version includes a method to visualize audio-samples as known in common audio-software (waveLab, CoolEdit...) using the GD-library.
+
+inspire by [PHP-Extracts-attributes-of-audio-files-Visualization.html](https://www.phpclasses.org/package/482-PHP-Extracts-attributes-of-audio-files-Visualization.html)
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require :vendor_slug/:package_slug
+composer require masterfermin02/audio
 ```
 
 ## Usage
 
 ```php
-$skeleton = new VendorName\Skeleton();
-echo $skeleton->echoPhrase('Hello, VendorName!');
+$skeleton = new Masterfermin02\Audio();
+echo $skeleton->echoPhrase('Hello, Masterfermin02!');
 ```
 
 ## Testing
@@ -49,7 +43,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Fermin](https://github.com/masterfermin02)
 - [All Contributors](../../contributors)
 
 ## License
