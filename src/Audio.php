@@ -3,15 +3,14 @@
 namespace Masterfermin02\Audio;
 
 use Masterfermin02\Audio\ValueObjects\Id3v2;
-use stdClass;
 
 class Audio
 {
-    public $id3v2;
+    public ?Id3v2 $id3v2;
     /**
      * @var bool
      */
-    public $valid;
+    public bool $valid;
     public $vorbisComment;
     public $waveId;
 
@@ -71,7 +70,12 @@ class Audio
 
     public $bytePrv;
 
-    public $info;
+    public array $info = [];
+
+    public function __construct(
+        public readonly Mp3Info $mp3Info = new Mp3Info(),
+    ) {
+    }
 
     // ************************************************************************
     // mp3info extracts the attributes of mp3-files
@@ -80,27 +84,7 @@ class Audio
 
     public function mp3info(): void
     {
-        $byte = [];
-        $version = ["MPEG Version 2.5", false, "MPEG Version 2 (ISO/IEC 13818-3)", "MPEG Version 1 (ISO/IEC 11172-3)"];
-        $version_bitrate = [1, false, 1, 0];
-        $version_sampling = [2, false, 1, 0];
-        $layer = [false, "Layer III", "Layer II", "Layer I"];
-        $layer_bitrate = [false, 2, 1, 0];
-        $layer_lengt = [false, 1, 1, 0];
-        $protection = ["Protected by CRC (16bit crc follows header)", "Not protected"];
-        $byterate = [[["free", 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, "bad"], ["free", 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, "bad"], ["free", 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, "bad"]], [["free", 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, "bad"], ["free", 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, "bad"], ["free", 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, "bad"]]];
-        $samplingrate = [[44100, 48000, 32000, false], [22050, 24000, 16000, false], [11025, 12000, 8000, false]];
-        $cannel_mode = ["Stereo", "Joint stereo (Stereo)", "Dual channel (Stereo)", "Single channel (Mono)"];
-        $copyright = ["Audio is not copyrighted", "Audio is copyrighted "];
-        $original = ["Copy of original media", "Original media"];
-        $emphasis = ["none", "50/15 ms", false, "CCIT J.17 "];
-
-        //id3-stuff
-
-        $genre = ["Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz", "Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno", "Industrial", "Alternative", "Ska", "Death Metal", "Pranks", "Soundtrack", "Euro-Techno", "Ambient", "Trip-Hop", "Vocal", "Jazz+Funk", "Fusion", "Trance", "Classical", "Instrumental", "Acid", "House", "Game", "Sound Clip", "Gospel", "Noise", "Alternative Rock", "Bass", "Soul", "Punk", "Space", "Meditative", "Instrumental Pop", "Instrumental Rock", "Ethnic", "Gothic", "Darkwave", "Techno-Industrial", "Electronic", "Pop-Folk", "Eurodance", "Dream", "Southern Rock", "Comedy", "Cult", "Gangsta", "Top 40", "Christian Rap", "Pop/Funk", "Jungle", "Native US", "Cabaret", "New Wave", "Psychadelic", "Rave", "Showtunes", "Trailer", "Lo-Fi", "Tribal", "Acid Punk", "Acid Jazz", "Polka", "Retro", "Musical", "Rock & Roll", "Hard Rock", "Folk", "Folk-Rock", "National Folk", "Swing", "Fast Fusion", "Bebob", "Latin", "Revival", "Celtic", "Bluegrass", "Avantgarde", "Gothic Rock", "Progressive Rock", "Psychedelic Rock", "Symphonic Rock", "Slow Rock", "Big Band", "Chorus", "Easy Listening", "Acoustic", "Humour", "Speech", "Chanson", "Opera", "Chamber Music", "Sonata", "Symphony", "Booty Bass", "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba", "Folklore", "Ballad", "Power Ballad", "Rhytmic Soul", "Freestyle", "Duet", "Punk Rock", "Drum Solo", "Acapella", "Euro-House", "Dance Hall", "Goa", "Drum & Bass", "Club-House", "Hardcore", "Terror", "Indie", "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap", "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian", "Christian Rock", "Merengue", "Salsa", "Trash Metal", "Anime", "Jpop", "Synthpop"];
-
         //id3v2 check----------------------------
-        $footer = 0;
         $header = 0;
         $v1tag = 0;
         $fp = fopen($this->waveFilename,"r");
@@ -115,7 +99,7 @@ class Audio
 
         } else {
             fseek ($fp,0);
-            $this->id3v2 = false;
+            $this->id3v2 = null;
         }
 
         for ($x=0;$x<4;++$x)
@@ -132,56 +116,53 @@ class Audio
         if(str_starts_with($TAG, "TAG"))
         {
             $v1tag = 128;
-            $info["mpeg_id3v1_tag"]["title"] = rtrim(substr($TAG,3,30));
-            $info["mpeg_id3v1_tag"]["artist"] = rtrim(substr($TAG,33,30));
-            $info["mpeg_id3v1_tag"]["album"] = rtrim(substr($TAG,63,30));
-            $info["mpeg_id3v1_tag"]["year"] = rtrim(substr($TAG,93,4));
-            $info["mpeg_id3v1_tag"]["comment"] = rtrim(substr($TAG,97,30));
-            $info["mpeg_id3v1_tag"]["genre"] = "";
+            $this->info["mpeg_id3v1_tag"]["title"] = rtrim(substr($TAG,3,30));
+            $this->info["mpeg_id3v1_tag"]["artist"] = rtrim(substr($TAG,33,30));
+            $this->info["mpeg_id3v1_tag"]["album"] = rtrim(substr($TAG,63,30));
+            $this->info["mpeg_id3v1_tag"]["year"] = rtrim(substr($TAG,93,4));
+            $this->info["mpeg_id3v1_tag"]["comment"] = rtrim(substr($TAG,97,30));
+            $this->info["mpeg_id3v1_tag"]["genre"] = "";
             $tmp = ord(substr($TAG,127,1));
-            if($tmp < count($genre))
+            if($tmp < count($this->mp3Info->genre))
             {
-                $info["mpeg_id3v1_tag"]["genre"] = $genre[$tmp];
+                $this->info["mpeg_id3v1_tag"]["genre"] = $this->mp3Info->genre[$tmp];
             }
         } else {
-            $info["mpeg_id3v1_tag"] = false;
+            $this->info["mpeg_id3v1_tag"] = false;
         }
 
         //version-------------------------------
 
         $tmp = $byte[1] & 24;
         $tmp >>= 3;
-        $info_i["mpeg_version"] = $tmp;
-        $byte_v = $version_bitrate[$tmp];
-        $byte_vs = $version_sampling[$tmp];
-        $info["mpeg_version"] = $version[$tmp];
+        $byte_v = $this->mp3Info->versionBitrate[$tmp];
+        $byte_vs = $this->mp3Info->versionSampling[$tmp];
+        $this->info["mpeg_version"] = $this->mp3Info->version[$tmp];
 
         //layer---------------------------------
 
         $tmp = $byte[1] & 6;
         $tmp >>= 1;
-        $info_i["mpeg_layer"] = $tmp;
-        $byte_l = $layer_bitrate[$tmp];
-        $byte_len = $layer_lengt[$tmp];
-        $info["mpeg_layer"] = $layer[$tmp];
+        $byte_l = $this->mp3Info->layerBitrate[$tmp];
+        $byte_len = $this->mp3Info->layerLength[$tmp];
+        $this->info["mpeg_layer"] = $this->mp3Info->layer[$tmp];
 
         //bitrate-------------------------------
 
         $tmp = $byte[2] & 240;
         $tmp >>= 4;
-        $info_i["mpeg_bitrate"] = $tmp;
-        $info["mpeg_bitrate"] = $byterate[$byte_v][$byte_l][$tmp];
+        $this->info["mpeg_bitrate"] = $this->mp3Info->byteRate[$byte_v][$byte_l][$tmp];
 
         //samplingrate--------------------------
 
         $tmp = $byte[2] & 12;
         $tmp >>= 2;
-        $info["mpeg_sampling_rate"] = $samplingrate[$byte_vs][$tmp];
+        $this->info["mpeg_sampling_rate"] = $this->mp3Info->samplingRate[$byte_vs][$tmp];
 
         //protection----------------------------
 
         $tmp = $byte[1] & 1;
-        $info["mpeg_protection"] = $protection[$tmp];
+        $this->info["mpeg_protection"] = $this->mp3Info->protection[$tmp];
 
         //paddingbit----------------------------
 
@@ -189,7 +170,6 @@ class Audio
         $tmp >>= 1;
 
         $byte_pad = $tmp;
-        $info["mpeg_padding_bit"] = $tmp;
 
         //privatebit----------------------------
 
@@ -200,35 +180,35 @@ class Audio
 
         $tmp = $byte[3] & 192;
         $tmp >>= 6;
-        $this->info["mpeg_channel_mode"] = $cannel_mode[$tmp];
+        $this->info["mpeg_channel_mode"] = $this->mp3Info->channelMode[$tmp];
 
         //copyright-----------------------------
 
         $tmp = $byte[3] & 8;
         $tmp >>= 3;
-        $this->info["mpeg_copyright"] = $copyright[$tmp];
+        $this->info["mpeg_copyright"] = $this->mp3Info->copyright[$tmp];
 
         //original------------------------------
 
         $tmp = $byte[3] & 4;
         $tmp >>= 2;
-        $this->info["mpeg_original"] = $original[$tmp];
+        $this->info["mpeg_original"] = $this->mp3Info->original[$tmp];
 
         //emphasis------------------------------
 
         $tmp = $byte[3] & 3;
-        $info["mpeg_emphasis"] = $emphasis[$tmp];
+        $this->info["mpeg_emphasis"] = $this->mp3Info->emphasis[$tmp];
 
         //framelenght---------------------------
 
-        if ($info["mpeg_bitrate"] == 'free' || $info["mpeg_bitrate"] == 'bad' || !$info["mpeg_bitrate"] || !$info["mpeg_sampling_rate"]) {
-            $info["mpeg_framelength"] = 0;
+        if ($this->info["mpeg_bitrate"] == 'free' || $this->info["mpeg_bitrate"] == 'bad' || !$this->info["mpeg_bitrate"] || !$this->info["mpeg_sampling_rate"]) {
+            $this->info["mpeg_framelength"] = 0;
         } elseif ($byte_len == 0) {
-            $rate_tmp = $info["mpeg_bitrate"] * 1000;
-            $info["mpeg_framelength"] = (12 * $rate_tmp / $info["mpeg_sampling_rate"] + $byte_pad) * 4 ;
+            $rate_tmp = $this->info["mpeg_bitrate"] * 1000;
+            $this->info["mpeg_framelength"] = (12 * $rate_tmp / $this->info["mpeg_sampling_rate"] + $byte_pad) * 4 ;
         } elseif($byte_len == 1) {
-            $rate_tmp = $info["mpeg_bitrate"] * 1000;
-            $info["mpeg_framelength"] = 144 * $rate_tmp / $info["mpeg_sampling_rate"] + $byte_pad;
+            $rate_tmp = $this->info["mpeg_bitrate"] * 1000;
+            $this->info["mpeg_framelength"] = 144 * $rate_tmp / $this->info["mpeg_sampling_rate"] + $byte_pad;
         }
 
         //duration------------------------------
@@ -236,38 +216,37 @@ class Audio
         $tmp = filesize($this->waveFilename);
         $tmp = $tmp - $header - 4 - $v1tag;
 
-        $tmp2 = 0;
-        $info["mpeg_frames"]="";
-        $info["mpeg_playtime"]="";
-        if(!$info["mpeg_bitrate"] || $info["mpeg_bitrate"] == 'bad' || !$info["mpeg_sampling_rate"])
+        $this->info["mpeg_frames"]="";
+        $this->info["mpeg_playtime"]="";
+        if(!$this->info["mpeg_bitrate"] || $this->info["mpeg_bitrate"] == 'bad' || !$this->info["mpeg_sampling_rate"])
         {
             $info["mpeg_playtime"] = -1;
-        } elseif($info["mpeg_bitrate"] == 'free')
+        } elseif($this->info["mpeg_bitrate"] == 'free')
         {
             $info["mpeg_playtime"] = -1;
         } else {
-            $tmp2 = ((8 * $tmp) / 1000) / $info["mpeg_bitrate"];
-            $info["mpeg_frames"] = floor($tmp/$info["mpeg_framelength"]);
+            $tmp2 = ((8 * $tmp) / 1000) / $this->info["mpeg_bitrate"];
+            $info["mpeg_frames"] = floor($tmp/$this->info["mpeg_framelength"]);
             $tmp *= 8;
             if ($rate_tmp != 0)
             {
-                $info["mpeg_playtime"] = $tmp/$rate_tmp;
+                $this->info["mpeg_playtime"] = $tmp/$rate_tmp;
+            } else {
+                $this->info["mpeg_playtime"] = $tmp2;
             }
-
-            $info["mpeg_playtime"] = $tmp2;
         }
 
         // transfer the extracted data into classAudioFile-structure
 
         $this->waveId = "MPEG";
-        $this->waveType = $info["mpeg_version"];
-        $this->waveCompression = $info["mpeg_layer"];
-        $this->waveChannels = $info["mpeg_channel_mode"] ?? '';
-        $this->waveFramerate = $info["mpeg_sampling_rate"];
-        $this->waveByterate = $info["mpeg_bitrate"] . " Kbit/sec";
+        $this->waveType = $this->info["mpeg_version"];
+        $this->waveCompression = $this->info["mpeg_layer"];
+        $this->waveChannels = $this->info["mpeg_channel_mode"] ?? '';
+        $this->waveFramerate = $this->info["mpeg_sampling_rate"];
+        $this->waveByterate = $this->info["mpeg_bitrate"] . " Kbit/sec";
         $this->waveBits = "n/a";
         $this->waveSize = filesize($this->waveFilename);
-        $this->waveLength = $info["mpeg_playtime"];
+        $this->waveLength = $this->info["mpeg_playtime"];
 
         // pick up length from id3v2 tag if necessary and available
         if ($this->waveLength<1 && is_array($this->id3v2->TLEN) )
@@ -275,16 +254,16 @@ class Audio
             $this->waveLength= ( $this->id3v2->TLEN['value'] / 1000 );
         }
 
-        $this->id3Tag = $info["mpeg_id3v1_tag"];
+        $this->id3Tag = $this->info["mpeg_id3v1_tag"];
 
         if ($this->id3Tag)
         {
-            $this->id3Title = $info["mpeg_id3v1_tag"]["title"];
-            $this->id3Artist = $info["mpeg_id3v1_tag"]["artist"];
-            $this->id3Album = $info["mpeg_id3v1_tag"]["album"];
-            $this->id3Year = $info["mpeg_id3v1_tag"]["year"];
-            $this->id3Comment = $info["mpeg_id3v1_tag"]["comment"];
-            $this->id3Genre = $info["mpeg_id3v1_tag"]["genre"];
+            $this->id3Title = $this->info["mpeg_id3v1_tag"]["title"];
+            $this->id3Artist = $this->info["mpeg_id3v1_tag"]["artist"];
+            $this->id3Album = $this->info["mpeg_id3v1_tag"]["album"];
+            $this->id3Year = $this->info["mpeg_id3v1_tag"]["year"];
+            $this->id3Comment = $this->info["mpeg_id3v1_tag"]["comment"];
+            $this->id3Genre = $this->info["mpeg_id3v1_tag"]["genre"];
         }
     }
 
@@ -323,7 +302,7 @@ class Audio
      * @param $mode
      * @return float|int
      */
-    public function shortCalc ($b1,$b2,$mode): float|int
+    public function shortCalc($b1,$b2,$mode): float|int
     {
         $b1 = hexdec(bin2hex((string) $b1));
         $b2 = hexdec(bin2hex((string) $b2));
@@ -374,7 +353,7 @@ class Audio
     // * 8/16/24/32 bit sample-resolution )
     // ************************************************************************
 
-    public function getVisualization ($output): void
+    public function getVisualization($output): void
     {
         $width=$this->visualWidth;
         $height=$this->visualHeight;
@@ -530,9 +509,6 @@ class Audio
             }
 
             fclose ($file);
-        } else {
-            // AudioSample - AudioFile-Object not initialized!
-
         }
     }
 
@@ -547,8 +523,7 @@ class Audio
         if (str_contains(strtoupper((string)$this->waveFilename), "MP3"))
         {
             $this->mp3info();
-        } elseif (str_ends_with(strtoupper((string) $this->waveFilename), "OGG"))
-        {
+        } elseif (str_ends_with(strtoupper((string) $this->waveFilename), "OGG")) {
             $this->ogginfo ();
         } else {
 
@@ -898,7 +873,7 @@ class Audio
     // For more info on Vorbis, see http://www.xiph.org/ogg/vorbis/doc/Vorbis_I_spec.html
     // ************************************************************************
 
-    public function ogginfo (): int
+    public function ogginfo(): int
     {
         $fp = fopen($this->waveFilename,"r");
 
