@@ -32,6 +32,9 @@ if ($audio->waveId == "RIFF")
 }
 ```
 
+## Screenshots
+![result](./screen/Screenshot%202023-12-04%20at%203.40.12%20PM.png?raw=true "Result")
+
 ## Testing
 
 ```bash
