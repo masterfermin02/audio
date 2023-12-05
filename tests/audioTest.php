@@ -34,8 +34,8 @@ print "</td><td valign=top>";
 if (isset($_GET['filename']) &&  $_GET['filename'] <> "")
 {
     $audio = Audio::create();
-    $filename = $_GET['filename'];
-    $audio->loadFile(getenv('filename'));
+    $filename = './audios/' .$_GET['filename'];
+    $audio->loadFile($filename);
     $audio->printSampleInfo();
 
     if ($audio->waveId == "RIFF")
