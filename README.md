@@ -19,14 +19,15 @@ composer require masterfermin02/audio
 ## Usage
 
 ```php
-$audio = new Masterfermin02\Audio();
-$filename = './audios/test.mp3';
-$audio->loadFile($filename);
+use Masterfermin02\Audio\Audio;
+
+$audio = Audio::create();
+
+$audio->loadFile(getenv('filename'));
 $audio->printSampleInfo();
+
 if ($audio->waveId == "RIFF")
 {
-    $audio->visualWidth=600;
-    $audio->visualHeight=500;
     $audio->getVisualization(substr($filename,0,strlen($filename)-4).".png");
     print "<img src=./".substr($filename,0,strlen($filename)-4).".png>";
 }

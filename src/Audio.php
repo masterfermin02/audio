@@ -77,6 +77,11 @@ class Audio
     ) {
     }
 
+    public static function create(): self
+    {
+        return new static();
+    }
+
     // ************************************************************************
     // mp3info extracts the attributes of mp3-files
     // (code contributed by reto gassmann (gassi@gassi.cx)

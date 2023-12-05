@@ -33,15 +33,16 @@ print "</td><td valign=top>";
 
 if (isset($_GET['filename']) &&  $_GET['filename'] <> "")
 {
-    $AF = new Audio;
-    $AF->loadFile('./audios/' . $_GET['filename']);
-    $AF->printSampleInfo();
-    if ($AF->waveId == "RIFF")
+    $audio = Audio::create();
+    $filename = $_GET['filename'];
+    $audio->loadFile(getenv('filename'));
+    $audio->printSampleInfo();
+
+    if ($audio->waveId == "RIFF")
     {
-        $AF->visualWidth=600;
-        $AF->visualHeight=500;
-        $AF->getVisualization(substr($_GET['filename'],0,strlen($_GET['filename'])-4).".png");
-        print "<img src=./".substr($_GET['filename'],0,strlen($_GET['filename'])-4).".png>";
+        $imageSrc = substr($filename,0,strlen($filename)-4) . ".png";
+        $audio->getVisualization($imageSrc);
+        print "<img src='./$imageSrc' alt='image generated.' />";
     }
 }
 print "</td></tr></table></body></html>";
