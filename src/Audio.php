@@ -72,6 +72,8 @@ class Audio
 
     public array $info = [];
 
+    private string $imageBaseDir = './';
+
     public function __construct(
         public readonly Mp3Info $mp3Info = new Mp3Info(),
     ) {
@@ -351,24 +353,33 @@ class Audio
         return ($id);
     }
 
+    public function setImageBaseDir(string $dir): self
+    {
+        $this->imageBaseDir = $dir;
+
+        return $this;
+    }
+
+    /**
     // ************************************************************************
     // getVisualization creates a graphical visualization of the audio-sample
     // (works ONLY * for uncompressed waves!
     // * files with 1 or 2 channels
     // * 8/16/24/32 bit sample-resolution )
     // ************************************************************************
-
-    public function getVisualization($output): void
+     *
+     * */
+    public function getVisualization(string $filename): string
     {
+        $output = $this->imageBaseDir . substr($filename,0,strlen($filename)-4) . ".png";
         $width=$this->visualWidth;
         $height=$this->visualHeight;
         $height_channel = $height / $this->waveChannels;
-        if ($this->waveFilename != "" && $this->waveId == "RIFF" && $this->waveType == "WAVE" && ($this->waveChannels>=1 && $this->waveChannels<=2) && $this->waveBits%8==0)
+        if ($this->hasVisualization())
         {
             $file = fopen ($this->waveFilename,"r");
 
             // read the first 12 bytes (RIFF- & WAVE-chunk)
-
             for ($i=0;$i<12;++$i)
             {
                 $null = fgetc ($file);
@@ -506,15 +517,26 @@ class Audio
                     // change this to generate JPG or direct output to browser
                     if (strtolower((string) $this->visualFileformat) == "jpeg")
                     {
-                        ImageJpeg ($im,$output);
+                        ImageJpeg($im,$output);
                     } else {
-                        ImagePng ($im,$output);
+                        ImagePng($im,$output);
                     }
                 }
             }
 
             fclose ($file);
         }
+
+        return $output;
+    }
+
+    private function hasVisualization(): bool
+    {
+        return $this->waveFilename != ""
+            && $this->waveId == "RIFF"
+            && $this->waveType == "WAVE"
+            && ($this->waveChannels>=1 && $this->waveChannels<=2)
+            && $this->waveBits%8==0;
     }
 
     // ************************************************************************

@@ -28,8 +28,26 @@ $audio->printSampleInfo();
 
 if ($audio->waveId == "RIFF")
 {
-    $audio->getVisualization(substr($filename,0,strlen($filename)-4).".png");
-    print "<img src=./".substr($filename,0,strlen($filename)-4).".png>";
+    $imageSrc = $audio->getVisualization($filename);
+    print "<img src='$imageSrc' />";
+}
+```
+
+## You can add the image dir
+
+```php
+use Masterfermin02\Audio\Audio;
+
+$audio = Audio::create();
+
+$audio->loadFile(getenv('filename'));
+$audio->printSampleInfo();
+
+if ($audio->waveId == "RIFF")
+{
+    $imageSrc = $audio->setImageBaseDir('./images/')
+    ->getVisualization($filename);
+    print "<img src='$imageSrc' />";
 }
 ```
 
