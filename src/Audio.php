@@ -99,7 +99,7 @@ class Audio
 
     public function getCompression($id): string
     {
-        if ($this->waveId != "MPEG" && $this->waveId !="OGG") {
+        if ($this->wave->id != "MPEG" && $this->wave->id !="OGG") {
             $append = sprintf('(%s)', $id);
             return match ($id) {
                 0 => 'unknown ' . $append,
@@ -361,16 +361,16 @@ class Audio
         {
             print "<tr><td align=right>id3v2-tags</td><td>";
             print "<table width=100% border=1>";
-            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->id3v2->TIT2."</td></tr>";
-            print "<tr><td align=right>artist</td><td>&nbsp;".$this->id3v2->TPE1."</td></tr>";
-            print "<tr><td align=right>original artist</td><td>&nbsp;".$this->id3v2->TOPE."</td></tr>";
-            print "<tr><td align=right>album</td><td>&nbsp;".$this->id3v2->TALB."</td></tr>";
-            print "<tr><td align=right>year</td><td>&nbsp;".$this->id3v2->TYER."</td></tr>";
-            print "<tr><td align=right>comment</td><td>&nbsp;".$this->id3v2->COMM."</td></tr>";
-            print "<tr><td align=right>composer</td><td>&nbsp;".$this->id3v2->TCOM."</td></tr>";
-            print "<tr><td align=right>genre</td><td>&nbsp;".$this->id3v2->TCON."</td></tr>";
-            print "<tr><td align=right>encoder</td><td>&nbsp;".$this->id3v2->TENC."</td></tr>";
-            print "<tr><td align=right>website</td><td>&nbsp;".$this->id3v2->WXXX."</td></tr>";
+            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->wave->id3v2->TIT2."</td></tr>";
+            print "<tr><td align=right>artist</td><td>&nbsp;".$this->wave->id3v2->TPE1."</td></tr>";
+            print "<tr><td align=right>original artist</td><td>&nbsp;".$this->wave->id3v2->TOPE."</td></tr>";
+            print "<tr><td align=right>album</td><td>&nbsp;".$this->wave->id3v2->TALB."</td></tr>";
+            print "<tr><td align=right>year</td><td>&nbsp;".$this->wave->id3v2->TYER."</td></tr>";
+            print "<tr><td align=right>comment</td><td>&nbsp;".$this->wave->id3v2->COMM."</td></tr>";
+            print "<tr><td align=right>composer</td><td>&nbsp;".$this->wave->id3v2->TCOM."</td></tr>";
+            print "<tr><td align=right>genre</td><td>&nbsp;".$this->wave->id3v2->TCON."</td></tr>";
+            print "<tr><td align=right>encoder</td><td>&nbsp;".$this->wave->id3v2->TENC."</td></tr>";
+            print "<tr><td align=right>website</td><td>&nbsp;".$this->wave->id3v2->WXXX."</td></tr>";
             print "</table>";
             print "</td></tr>";
         }

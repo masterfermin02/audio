@@ -12,24 +12,27 @@ class File
     /**
      * @var false|resource
      */
-    private $file;
+    protected $file;
 
-    private string $chunkId;
+    protected string $chunkId;
 
-    private string $chunkType;
+    protected string $chunkType;
 
-    private WaveSize $size;
+    protected WaveSize $size;
 
     public function __construct(
         public readonly string $fileName
     ) {
         $this->size = new WaveSize(filesize($fileName));
         $this->file = fopen ($fileName,"r");
+    }
+
+    public function generateInitialChunk(): void
+    {
         $this->chunkId = $this->getChunkLine();
         $this->generateNullLine();
         $this->chunkType = $this->getChunkLine();
     }
-
 
     public function getChunkId(): string
     {

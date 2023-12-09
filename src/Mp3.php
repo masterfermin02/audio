@@ -108,7 +108,6 @@ class Mp3 extends Wave
         $byte_l = $this->mp3Info->layerBitrate[$tmp];
         $byte_len = $this->mp3Info->layerLength[$tmp];
         $this->info["mpeg_layer"] = $this->mp3Info->layer[$tmp];
-
         //bitrate-------------------------------
 
         $tmp = $byte[2] & 240;
@@ -348,7 +347,7 @@ class Mp3 extends Wave
         }
 
         // position $fp at end of id3v2header
-        $this->file->fSeek($tagsize + 10, SEEK_SET);
+        $this->file->fSeek($tagsize + 10);
 
         return 1;
     }

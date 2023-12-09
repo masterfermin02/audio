@@ -43,6 +43,7 @@ class WaveFactory
             );
         }
 
+        $this->file->generateInitialChunk();
         $this->id = $this->file->getChunkId();
         $this->type = $this->file->getChunkType();
 
