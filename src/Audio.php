@@ -7,8 +7,6 @@ use Masterfermin02\Audio\ValueObjects\Id3v2;
 
 class Audio
 {
-    public ?Id3v2 $id3v2;
-
     public Wave|Mp3|Ogg $wave;
     /**
      * @var bool

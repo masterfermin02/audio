@@ -4,7 +4,7 @@
 [![Tests](https://github.com/masterfermin02/audio/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/masterfermin02/audio/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/masterfermin02/audio.svg?style=flat-square)](https://packagist.org/packages/masterfermin02/audio)
 
-This class was basically built to recognize attributes (like frequency, format, channels, resolution, compression, length, id3-tags) of audio-files (.wav,.aif,.mp3,.ogg at the moment). Furthermore the latest version includes a method to visualize audio-samples as known in common audio-software (waveLab, CoolEdit...) using the GD-library.
+This package was designed to identify various attributes of audio files such as frequency, format, channels, resolution, compression, length, and id3-tags. Currently, it supports audio files in .wav, .aif, .mp3, and .ogg formats. Additionally, the latest version comes with a feature that allows users to visualize audio samples similar to popular audio software such as waveLab and CoolEdit, using the GD library.
 
 inspire by [PHP-Extracts-attributes-of-audio-files-Visualization.html](https://www.phpclasses.org/package/482-PHP-Extracts-attributes-of-audio-files-Visualization.html)
 
