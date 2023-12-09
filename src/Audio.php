@@ -139,48 +139,48 @@ class Audio
     public function getVisualization(string $filename): string
     {
         $output = $this->imageBaseDir . substr($filename,0,strlen($filename)-4) . ".png";
-        $width=$this->visualWidth;
-        $height=$this->visualHeight;
-        $height_channel = $height / $this->waveChannels;
+        $width = $this->visualWidth;
+        $height = $this->visualHeight;
+        $height_channel = $height / $this->wave->channels;
         if ($this->hasVisualization())
         {
-            $file = fopen ($this->waveFilename,"r");
+            $file = new File($this->waveFilename);
 
             // read the first 12 bytes (RIFF- & WAVE-chunk)
             for ($i=0;$i<12;++$i)
             {
-                $null = fgetc ($file);
+                $file->generateNullLine();
             }
 
             // Read the next chunk-id, supposed to be "fmt "
 
-            $chunk_id_3 = fgetc($file) . fgetc($file) . fgetc($file) . fgetc($file);
+            $chunk_id_3 = $file->getChunkLine();
             if ($chunk_id_3 == "fmt ")
             {
-                $chunk_size_3 = $this->longCalc (fgetc($file) , fgetc($file) , fgetc($file) , fgetc($file),0);
+                $chunk_size_3 = $file->longCalc(Math::ZERO_MODE);
                 for ($i=0;$i<$chunk_size_3;++$i)
                 {
-                    $null = fgetc($file);
+                    $file->generateNullLine();
                 }
 
                 // Read the next chunk-id, supposed to be "data"
                 $chunk_id_4 = "";
-                while ($chunk_id_4 != "data" && !feof($file))
+                while ($chunk_id_4 != "data" && !$file->endOfFile())
                 {
-                    $chunk_id_4 = fgetc($file) . fgetc($file) . fgetc($file) . fgetc($file);
+                    $chunk_id_4 = $file->getChunkLine();
                     if ($chunk_id_4 != "data")
                     {
-                        $chunk_size_4 = $this->longCalc (fgetc($file) , fgetc($file) , fgetc($file) , fgetc($file),0);
+                        $chunk_size_4 = $file->longCalc(Math::ZERO_MODE);
                         for ($i=0;$i<$chunk_size_4;++$i)
                         {
-                            $null = fgetc($file);
+                            $file->generateNullLine();
                         }
                     }
                 }
 
                 if ($chunk_id_4 == "data")
                 {
-                    $chunk_size_4 = $this->longCalc (fgetc($file) , fgetc($file) , fgetc($file) , fgetc($file),0);
+                    $chunk_size_4 = $file->longCalc(Math::ZERO_MODE);
                     $visualData = [];
                     $bytes_per_frame = ($this->waveBits/8)*($this->waveChannels);
                     $bytes_per_channel = ($this->waveBits/8);
@@ -192,21 +192,21 @@ class Audio
                     // revised code -- computing bytes per pixel allows quick processing of large (>10MB) wavs by fseek()ing past unused data
                     $bytes_per_pixel= floor($chunk_size_4/$width);
                     $currentindex= 0;
-                    while (!feof($file) && $currentindex < $chunk_size_4)
+                    while (!$file->endOfFile() && $currentindex < $chunk_size_4)
                     {
                         $loopindex= 0;
-                        for ($j=0; $j<$this->waveChannels; ++$j)
+                        for ($j=0; $j<$this->wave->channels; ++$j)
                         {
                             $bytes = [];
                             for ($i=0;$i<$bytes_per_channel;++$i)
                             {
-                                $bytes[$i] = fgetc($file);
+                                $bytes[$i] = $file->fGetC();
                                 ++$loopindex;
                             }
 
                             switch ($bytes_per_channel)
                             {
-                                case 1: $visualData[$j][$data_index]= $this->shortCalc($bytes[0],$bytes[1],0);
+                                case 1: $visualData[$j][$data_index]= Math::shortCalc($bytes[0],$bytes[1],0);
                                     break;
                                 case 2: $f=128;
                                 if ((ord($bytes[1])&128) !== 0) {
@@ -214,33 +214,33 @@ class Audio
                                 }
 
                                     $x=chr((ord($bytes[1])&127) + $f);
-                                    $visualData[$j][$data_index]= floor($this->shortCalc($bytes[0],$x,0)/256);
+                                    $visualData[$j][$data_index]= floor(Math::shortCalc($bytes[0],$x,0)/256);
                                     break;
                             }
 
-                            if (($j+1) == $this->waveChannels)
+                            if (($j+1) == $this->wave->channels)
                             {
                                 ++$data_index;
                             }
                         }
 
                         $currentindex+= ( $bytes_per_pixel - $loopindex );
-                        fseek($file, $bytes_per_pixel, SEEK_CUR);
+                        $file->fSeek($bytes_per_pixel - $loopindex, SEEK_CUR);
                     }
 
                     //$im = @ImageCreate ($width, (256*$this->wave_channels)+1) or die ("Cannot Initialize new GD image stream!");
-                    ($im = @ImageCreate ($width, $height)) || die ("Cannot Initialize new GD image stream!");
-                    $background_color = ImageColorAllocate ($im, hexdec(substr((string) $this->visualBackgroundColor,1,2)),hexdec(substr((string) $this->visualBackgroundColor,3,2)),hexdec(substr((string) $this->visualBackgroundColor,5,2)));
-                    $cBlack = ImageColorAllocate ($im, hexdec(substr((string) $this->visualBackgroundColor,1,2)),hexdec(substr((string) $this->visualBackgroundColor,3,2)),hexdec(substr((string) $this->visualBackgroundColor,5,2)));
-                    $cGreen = ImageColorAllocate ($im, hexdec(substr((string) $this->visualGraphColor,1,2)),hexdec(substr((string) $this->visualGraphColor,3,2)),hexdec(substr((string) $this->visualGraphColor,5,2)));
-                    $cRed = ImageColorAllocate ($im, hexdec(substr((string) $this->visualBorderColor,1,2)),hexdec(substr((string) $this->visualBorderColor,3,2)),hexdec(substr((string) $this->visualBorderColor,5,2)));
-                    $cBlue = ImageColorAllocate ($im, hexdec(substr((string) $this->visualGridColor,1,2)),hexdec(substr((string) $this->visualGridColor,3,2)),hexdec(substr((string) $this->visualGridColor,5,2)));
+                    ($im = @ImageCreate($width, $height)) || die ("Cannot Initialize new GD image stream!");
+                    $background_color = ImageColorAllocate($im, hexdec(substr((string) $this->visualBackgroundColor,1,2)),hexdec(substr((string) $this->visualBackgroundColor,3,2)),hexdec(substr((string) $this->visualBackgroundColor,5,2)));
+                    $cBlack = ImageColorAllocate($im, hexdec(substr((string) $this->visualBackgroundColor,1,2)),hexdec(substr((string) $this->visualBackgroundColor,3,2)),hexdec(substr((string) $this->visualBackgroundColor,5,2)));
+                    $cGreen = ImageColorAllocate($im, hexdec(substr((string) $this->visualGraphColor,1,2)),hexdec(substr((string) $this->visualGraphColor,3,2)),hexdec(substr((string) $this->visualGraphColor,5,2)));
+                    $cRed = ImageColorAllocate($im, hexdec(substr((string) $this->visualBorderColor,1,2)),hexdec(substr((string) $this->visualBorderColor,3,2)),hexdec(substr((string) $this->visualBorderColor,5,2)));
+                    $cBlue = ImageColorAllocate($im, hexdec(substr((string) $this->visualGridColor,1,2)),hexdec(substr((string) $this->visualGridColor,3,2)),hexdec(substr((string) $this->visualGridColor,5,2)));
                     if ($this->visualBorder)
                     {
-                        ImageRectangle ($im,0,0,($width-1),($height-1),$cRed);
+                        ImageRectangle($im,0,0,($width-1),($height-1),$cRed);
                         for ($i=0; $i<=$this->waveChannels; ++$i)
                         {
-                            ImageLine ($im,1,($i*($height_channel/2))+($height_channel/2),$width,($i*($height_channel/2))+($height_channel/2),$cRed);
+                            ImageLine($im,1,($i*($height_channel/2))+($height_channel/2),$width,($i*($height_channel/2))+($height_channel/2),$cRed);
                         }
                     }
 
@@ -248,7 +248,7 @@ class Audio
                     {
                         for ($i=1;$i<=($width/100*2);++$i)
                         {
-                            ImageLine ($im,$i*50,0,$i*50,(256*$this->waveChannels),$cBlue);
+                            ImageLine($im,$i*50,0,$i*50,(256*$this->wave->channels),$cBlue);
                         }
                     }
                     // this for-loop draws a graph for every channel
@@ -271,9 +271,9 @@ class Audio
                             $val = $visualData[$j][$i] / $faktor;
                             if ($this->visualGraphMode == 0)
                             {
-                                ImageLine ($im,$last_x,($last_y+($j*$height_channel)),$i,($val+($j*$height_channel)),$cGreen);
+                                ImageLine($im,$last_x,($last_y+($j*$height_channel)),$i,($val+($j*$height_channel)),$cGreen);
                             } else {
-                                ImageLine ($im,$i,(($height_channel/2)+($j*$height_channel)),$i,($val+($j*$height_channel)),$cGreen);
+                                ImageLine($im,$i,(($height_channel/2)+($j*$height_channel)),$i,($val+($j*$height_channel)),$cGreen);
                             }
 
                             $last_x = $i;
@@ -291,7 +291,7 @@ class Audio
                 }
             }
 
-            fclose ($file);
+            $file->fClose();
         }
 
         return $output;

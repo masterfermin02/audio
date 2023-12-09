@@ -139,6 +139,11 @@ class File
         return rewind($this->file);
     }
 
+    public function fGetC(): string
+    {
+        return fgetc($this->file);
+    }
+
     public function __destroy(): void
     {
         $this->fClose();
