@@ -14,28 +14,13 @@ class Audio
      * @var bool
      */
     public bool $valid;
-    public $vorbisComment;
     public $waveId;
-
-    public $waveType;
 
     public $waveChannels;
 
     public $waveBits;
 
     public $waveFilename;
-
-    public $id3Title;
-
-    public $id3Artist;
-
-    public $id3Album;
-
-    public $id3Year;
-
-    public $id3Comment;
-
-    public $id3Genre;
 
     public $visualGraphColor;
      // HTML-Style: "#rrggbb"
