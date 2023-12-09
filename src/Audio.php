@@ -19,23 +19,11 @@ class Audio
 
     public $waveType;
 
-    public $waveCompression;
-
     public $waveChannels;
-
-    public $waveFramerate;
-
-    public $waveByterate;
 
     public $waveBits;
 
-    public $waveSize;
-
     public $waveFilename;
-
-    public $waveLength;
-
-    public $id3Tag;
 
     public $id3Title;
 
@@ -48,8 +36,6 @@ class Audio
     public $id3Comment;
 
     public $id3Genre;
-
-    public $id3v2info;
 
     public $visualGraphColor;
      // HTML-Style: "#rrggbb"
@@ -70,8 +56,6 @@ class Audio
     public $visualGraphMode;
      // 0|1
     public $visualFileformat; // "jpeg","png", everything & else default = "png"
-
-    public $bytePrv;
 
     public array $info = [];
 
@@ -299,11 +283,11 @@ class Audio
 
     private function hasVisualization(): bool
     {
-        return $this->waveFilename != ""
-            && $this->waveId == "RIFF"
-            && $this->waveType == "WAVE"
-            && ($this->waveChannels>=1 && $this->waveChannels<=2)
-            && $this->waveBits%8==0;
+        return $this->wave->fileName != ""
+            && $this->wave->id == "RIFF"
+            && $this->wave->type == "WAVE"
+            && ($this->wave->channels >= 1 && $this->wave->channels <= 2)
+            && $this->wave->bits %8==0;
     }
 
     // ************************************************************************
@@ -345,12 +329,12 @@ class Audio
         {
             print "<tr><td align=right>id3v1-tags</td><td>";
             print "<table width=100% border=1>";
-            print sprintf('<tr><td width=70 align=right>title</td><td>&nbsp;%s</td></tr>', $this->id3Title);
-            print sprintf('<tr><td align=right>artist</td><td>&nbsp;%s</td></tr>', $this->id3Artist);
-            print sprintf('<tr><td align=right>album</td><td>&nbsp;%s</td></tr>', $this->id3Album);
-            print sprintf('<tr><td align=right>year</td><td>&nbsp;%s</td></tr>', $this->id3Year);
-            print sprintf('<tr><td align=right>comment</td><td>&nbsp;%s</td></tr>', $this->id3Comment);
-            print sprintf('<tr><td align=right>genre</td><td>&nbsp;%s</td></tr>', $this->id3Genre);
+            print sprintf('<tr><td width=70 align=right>title</td><td>&nbsp;%s</td></tr>', $this->wave->id3Title);
+            print sprintf('<tr><td align=right>artist</td><td>&nbsp;%s</td></tr>', $this->wave->id3Artist);
+            print sprintf('<tr><td align=right>album</td><td>&nbsp;%s</td></tr>', $this->wave->id3Album);
+            print sprintf('<tr><td align=right>year</td><td>&nbsp;%s</td></tr>', $this->wave->id3Year);
+            print sprintf('<tr><td align=right>comment</td><td>&nbsp;%s</td></tr>', $this->wave->id3Comment);
+            print sprintf('<tr><td align=right>genre</td><td>&nbsp;%s</td></tr>', $this->wave->id3Genre);
             print "</table>";
             print "</td></tr>";
         } else {
@@ -384,12 +368,12 @@ class Audio
         {
             print "<tr><td align=right>ogg-tags</td><td>";
             print "<table width=100% border=1>";
-            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->vorbisComment->TITLE."</td></tr>";
-            print "<tr><td align=right>artist</td><td>&nbsp;".$this->vorbisComment->ARTIST."</td></tr>";
-            print "<tr><td align=right>album</td><td>&nbsp;".$this->vorbisComment->ALBUM."</td></tr>";
-            print "<tr><td align=right>date</td><td>&nbsp;".$this->vorbisComment->DATE."</td></tr>";
-            print "<tr><td align=right>genre</td><td>&nbsp;".$this->vorbisComment->GENRE."</td></tr>";
-            print "<tr><td align=right>comment</td><td>&nbsp;".$this->vorbisComment->COMMENT."</td></tr>";
+            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->wave->vorbisComment->TITLE."</td></tr>";
+            print "<tr><td align=right>artist</td><td>&nbsp;".$this->wave->vorbisComment->ARTIST."</td></tr>";
+            print "<tr><td align=right>album</td><td>&nbsp;".$this->wave->vorbisComment->ALBUM."</td></tr>";
+            print "<tr><td align=right>date</td><td>&nbsp;".$this->wave->vorbisComment->DATE."</td></tr>";
+            print "<tr><td align=right>genre</td><td>&nbsp;".$this->wave->vorbisComment->GENRE."</td></tr>";
+            print "<tr><td align=right>comment</td><td>&nbsp;".$this->wave->vorbisComment->COMMENT."</td></tr>";
             print "</table>";
             print "</td></tr>";
         } else {
