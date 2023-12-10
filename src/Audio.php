@@ -108,7 +108,7 @@ class Audio
         $output = $this->imageBaseDir . substr($filename,0,strlen($filename)-4) . ".png";
         $width = $this->visualWidth;
         $height = $this->visualHeight;
-        $height_channel = $height / $this->wave->channels;
+        $height_channel = $this->wave->channels > 0 ? $height / $this->wave->channels : 1;
         if ($this->hasVisualization())
         {
             $file = new File($this->waveFilename);
@@ -270,7 +270,7 @@ class Audio
             && $this->wave->id == "RIFF"
             && $this->wave->type == "WAVE"
             && ($this->wave->channels >= 1 && $this->wave->channels <= 2)
-            && $this->wave->bits %8==0;
+            && $this->wave->bits % 8 == 0;
     }
 
     // ************************************************************************
@@ -280,9 +280,11 @@ class Audio
     public function getSampleInfo(): bool
     {
         try {
-            $this->wave = $this->waveFactory->setFileName($this->waveFilename)
+            $this->wave = $this->waveFactory
+                ->setFileName($this->waveFilename)
                 ->build();
-        } catch (InvalidArgumentException) {
+        } catch (InvalidArgumentException $e) {
+            var_dump($e->getMessage());
             return false;
         }
 
@@ -308,7 +310,7 @@ class Audio
         print "<tr><td align=right>length</td> <td>&nbsp;".number_format ($this->wave->length,"2")." sec.<br>&nbsp;".date("i:s", mktime(0,0,round($this->wave->length)))."</td></tr>";
 
         // ID3V1
-        if ($this->wave->id3Tag)
+        if (isset($this->wave->id3Tag))
         {
             print "<tr><td align=right>id3v1-tags</td><td>";
             print "<table width=100% border=1>";
@@ -324,7 +326,7 @@ class Audio
             print "<tr><td align=right>id3v1-tags</td><td>Not found</td></tr>";
         }
 
-        if ($this->wave->id3v2)
+        if (isset($this->wave->id3v2))
         {
             print "<tr><td align=right>id3v2-tags</td><td>";
             print "<table width=100% border=1>";
@@ -351,12 +353,12 @@ class Audio
         {
             print "<tr><td align=right>ogg-tags</td><td>";
             print "<table width=100% border=1>";
-            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->wave->vorbisComment->TITLE."</td></tr>";
-            print "<tr><td align=right>artist</td><td>&nbsp;".$this->wave->vorbisComment->ARTIST."</td></tr>";
-            print "<tr><td align=right>album</td><td>&nbsp;".$this->wave->vorbisComment->ALBUM."</td></tr>";
-            print "<tr><td align=right>date</td><td>&nbsp;".$this->wave->vorbisComment->DATE."</td></tr>";
-            print "<tr><td align=right>genre</td><td>&nbsp;".$this->wave->vorbisComment->GENRE."</td></tr>";
-            print "<tr><td align=right>comment</td><td>&nbsp;".$this->wave->vorbisComment->COMMENT."</td></tr>";
+            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->wave->vorbisComment['TITLE']."</td></tr>";
+            print "<tr><td align=right>artist</td><td>&nbsp;".$this->wave->vorbisComment['ARTIST']."</td></tr>";
+            print "<tr><td align=right>album</td><td>&nbsp;".$this->wave->vorbisComment['ALBUM']."</td></tr>";
+            print "<tr><td align=right>date</td><td>&nbsp;".$this->wave->vorbisComment['DATE']."</td></tr>";
+            print "<tr><td align=right>genre</td><td>&nbsp;".$this->wave->vorbisComment['GENRE']."</td></tr>";
+            print "<tr><td align=right>comment</td><td>&nbsp;". ($this->wave->vorbisComment['COMMENT'] ?? '')."</td></tr>";
             print "</table>";
             print "</td></tr>";
         } else {
@@ -373,7 +375,9 @@ class Audio
     public function loadFile($loadFilename): void
     {
         $this->waveFilename = $loadFilename;
-        $this->getSampleInfo();
+        if (!$this->getSampleInfo()) {
+            throw new InvalidArgumentException('Invalid file');
+        }
         $this->visualGraphColor = "#18F3AD";
         $this->visualBackgroundColor = "#000000";
         $this->visualGridColor = "#002C4A";

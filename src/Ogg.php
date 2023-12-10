@@ -21,7 +21,9 @@ class Ogg extends Wave
 
     public $waveLength;
 
-    public $vorbisComment;
+    public array $vorbisComment;
+
+    public string $version;
 
     public function __construct(
         public readonly File $file,
@@ -55,7 +57,10 @@ class Ogg extends Wave
             8) [blocksize_1] = 2 exponent (read 4 bits as unsigned integer) -- IGNORING
             9) [framing_flag] = read one bit -- IGNORING
             */
-            $identification= unpack('L1vorbis_version/C1audio_channels/L1audio_sample_rate/L1bitrate_maximum/L1bitrate_nominal/L1bitrate_minimum', fread($fp,21));
+            $identification= unpack(
+                'L1vorbis_version/C1audio_channels/L1audio_sample_rate/L1bitrate_maximum/L1bitrate_nominal/L1bitrate_minimum',
+                $this->file->fRead(21)
+            );
             //print "<pre>".print_r($identification,1)."</pre>";
         }
 
@@ -78,7 +83,7 @@ class Ogg extends Wave
 
                 Note that there may be more than one instance of any field
             */
-            $vendor= unpack('L1vendor_length', fread($fp,4));
+            $vendor= unpack('L1vendor_length', $this->file->fRead(4));
             $vendor['vendor_string']= $this->file->fRead( $vendor['vendor_length']);
             $list= unpack('L1user_comment_list_length', $this->file->fRead(4));
             for ($i=0; $i<$list['user_comment_list_length']; ++$i)
@@ -98,20 +103,16 @@ class Ogg extends Wave
                 Any additional artist fields will be pushed onto the end of the $this->vorbis_comment->ARTIST array by the elseif
                 */
 
-                if ($this->vorbisComment->{$array[0]}!="" && !is_array( $this->vorbisComment->{$array[0]}) )
-                {
+                if (isset($this->vorbisComment[$array[0]]) && !is_array($this->vorbisComment[$array[0]])) {
                     // second instance, convert to array
-                    $temp= $this->vorbisComment->{$array[0]};
-                    $this->vorbisComment->{$array[0]}= [$temp, $array[1]];
-                }
-                elseif (is_array($this->vorbisComment->{$array[0]})) {
+                    $temp= $this->vorbisComment[$array[0]];
+                    $this->vorbisComment[$array[0]] = [$temp, $array[1]];
+                } elseif (isset($this->vorbisComment[$array[0]]) && is_array($this->vorbisComment[$array[0]])) {
                     // third through nth instances, add to array
-                    $this->vorbisComment->{$array[0]}[] = $array[1];
-                }
-                else
-                {
+                    $this->vorbisComment[$array[0]][] = $array[1];
+                } else {
                     // first instance
-                    $this->vorbisComment->{$array[0]}= $array[1];
+                    $this->vorbisComment[$array[0]] = $array[1];
                 }
             }
 
@@ -125,6 +126,7 @@ class Ogg extends Wave
         $this->file->fSeek($nearend, SEEK_END);
 
         // look for page of type 4 or higher (0x04 == end-of-stream)
+        $type = 0;
         while($type < 4 && !$this->file->endOfFile()) {
             $type= $this->findOggPage();
         }
@@ -147,9 +149,11 @@ class Ogg extends Wave
         $bytes[5]= ord($this->file->fRead(1));
         $bytes[6]= ord($this->file->fRead(1));
         $bytes[7]= ord($this->file->fRead(1));
+        $samples = 0;
+
         foreach ($bytes AS $exp=>$value)
         {
-            $samples+= ($value * 256 ** $exp);
+            $samples += ($value * 256 ** $exp);
         }
 
         $seconds= round(($samples / $identification['audio_sample_rate']), 2);

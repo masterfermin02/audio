@@ -38,7 +38,7 @@ if (isset($_GET['filename']) &&  $_GET['filename'] <> "")
     $audio->loadFile($filename);
     $audio->printSampleInfo();
 
-    if ($audio->waveId == "RIFF")
+    if ($audio->wave->id == "RIFF")
     {
         $imageSrc = $audio->getVisualization($filename);
         print "<img src='./$imageSrc' alt='image generated.' />";

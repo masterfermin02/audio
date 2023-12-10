@@ -17,8 +17,7 @@ class Riff extends Wave
     ) {
         $this->chunkId = $file->getChunkId();
         $this->chunkSize = $this->file->longCalc(Math::ZERO_MODE);
-        if ($this->chunkId == "fmt ")
-        {
+        if (in_array($this->chunkId, ["fmt "])) {
             $formatLen = $this->chunkSize;
             $waveCompression = $this->file->shortCalc(Math::ZERO_MODE);
             $waveChannels = $this->file->shortCalc(Math::ZERO_MODE);
@@ -35,6 +34,7 @@ class Riff extends Wave
             {
                 $waveLength = (($chunkSize / $waveChannels) / ($waveBits/self::HEIGHT_BITS)) / $waveFramerate;
             } else {
+
                 while ($chunkId != "data" && !$this->file->endOfFile())
                 {
                     $j = 1;
@@ -52,19 +52,18 @@ class Riff extends Wave
                 {
                     $waveLength = (($chunkSize / $waveChannels) / ($waveBits/self::HEIGHT_BITS)) / $waveFramerate;
                 }
-
             }
             parent::__construct(
-                $this->file->fileName,
-                $this->file->getSize(),
-                $chunkId,
-                $this->file->getChunkType(),
-                $waveCompression,
-                $waveChannels,
-                $waveFramerate,
-                $waveByterate,
-                $waveBits,
-                $waveLength,
+                fileName: $this->file->fileName,
+                size: $this->file->getSize(),
+                id: $this->chunkId,
+                type: $this->file->getChunkType(),
+                compression: $waveCompression,
+                channels: $waveChannels,
+                fameRate: $waveFramerate,
+                byteRate: $waveByterate,
+                bits: $waveBits,
+                length: $waveLength,
             );
         } else {
             throw new \InvalidArgumentException('The file is not a RIFF file');

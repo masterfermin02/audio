@@ -119,7 +119,7 @@ class WaveFactory
         return $this;
     }
 
-    public function setSize(string $size): self
+    public function setSize(WaveSize $size): self
     {
         $this->size = $size;
         return $this;
