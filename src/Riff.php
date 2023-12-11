@@ -2,8 +2,6 @@
 
 namespace Masterfermin02\Audio;
 
-use Masterfermin02\Audio\ValueObjects\WaveSize;
-
 class Riff extends Wave
 {
     private string $chunkId;
@@ -17,7 +15,7 @@ class Riff extends Wave
     ) {
         $this->chunkId = $file->getChunkId();
         $this->chunkSize = $this->file->longCalc(Math::ZERO_MODE);
-        if (in_array($this->chunkId, ["fmt "])) {
+        if ($this->chunkId === "RIFF") {
             $formatLen = $this->chunkSize;
             $waveCompression = $this->file->shortCalc(Math::ZERO_MODE);
             $waveChannels = $this->file->shortCalc(Math::ZERO_MODE);

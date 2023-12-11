@@ -23,7 +23,7 @@ while (false !== ($file = readdir($handle)))
             (substr(strtoupper($file),strlen($file)-4,4)==".OGG") ||
             (substr(strtoupper($file),strlen($file)-4,4)==".MP3") )
         {
-            print "<a href=\"./audioTest.php?filename=$file\">$file</a><br>";
+            print "<a href=\"./audio.php?filename=$file\">$file</a><br>";
         } else {
         }
     }

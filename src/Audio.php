@@ -42,7 +42,7 @@ class Audio
 
     public array $info = [];
 
-    private string $imageBaseDir = './';
+    public string $imageBaseDir = './';
 
     public function __construct(
         public readonly Mp3Info $mp3Info = new Mp3Info(),
@@ -66,7 +66,7 @@ class Audio
 
     public function getCompression($id): string
     {
-        if ($this->wave->id != "MPEG" && $this->wave->id !="OGG") {
+        if (isset($this->wave) && $this->wave->id != "MPEG" && $this->wave->id !="OGG") {
             $append = sprintf('(%s)', $id);
             return match ($id) {
                 0 => 'unknown ' . $append,
@@ -279,14 +279,9 @@ class Audio
 
     public function getSampleInfo(): bool
     {
-        try {
-            $this->wave = $this->waveFactory
-                ->setFileName($this->waveFilename)
-                ->build();
-        } catch (InvalidArgumentException $e) {
-            var_dump($e->getMessage());
-            return false;
-        }
+        $this->wave = $this->waveFactory
+            ->setFileName($this->waveFilename)
+            ->build();
 
         return true;
     }

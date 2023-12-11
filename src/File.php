@@ -23,7 +23,10 @@ class File
     public function __construct(
         public readonly string $fileName
     ) {
-        $this->size = new WaveSize(filesize($fileName));
+
+        if(!$this->size = new WaveSize(@filesize($fileName))) {
+            throw new \InvalidArgumentException('The size of the file must be greater than 16');
+        }
         $this->file = fopen ($fileName,"r");
     }
 
