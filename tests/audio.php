@@ -40,8 +40,7 @@ if (isset($_GET['filename']) &&  $_GET['filename'] <> "")
 
     if ($audio->wave->id == "RIFF")
     {
-        $imageSrc = $audio->getVisualization($filename);
-        print "<img src='./$imageSrc' alt='image generated.' />";
+        $audio->getVisualization();
     }
 }
 print "</td></tr></table></body></html>";

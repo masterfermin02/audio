@@ -2,10 +2,11 @@
 
 namespace Masterfermin02\Audio;
 
-class Form extends Wave
+class Form extends Wave implements MetaData
 {
     public function __construct(
         public readonly File $file,
+        public readonly PrintBasicInfo $printBasicInfo,
     ) {
         $chunkId = $this->file->getChunkLine();
         $chunkSize = $this->file->longCalc(Math::ZERO_MODE);
@@ -32,5 +33,15 @@ class Form extends Wave
         } else {
             throw new \InvalidArgumentException('The file is not a wav file');
         }
+    }
+
+    public function printInfo(): void
+    {
+        $this->printBasicInfo->printInfo($this);
+    }
+
+    public function visualize(): void
+    {
+        // TODO: Implement visualize() method.
     }
 }

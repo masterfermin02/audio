@@ -33,13 +33,15 @@ class WaveFactory
         if ($this->isMp3()) {
             return new Mp3(
                 $this->file,
-                new Mp3Info()
+                new Mp3Info(),
+                new PrintBasicInfo()
             );
         }
 
         if ($this->isOgg()) {
             return new Ogg(
                 $this->file,
+                new PrintBasicInfo()
             );
         }
 
@@ -65,12 +67,15 @@ class WaveFactory
         if ($this->isRiff()) {
             return new Riff(
                 $this->file,
+                new PrintBasicInfo(),
+                './'
             );
         }
 
         if ($this->isForm()) {
             return new Form(
                 $this->file,
+                new PrintBasicInfo(),
             );
         }
 

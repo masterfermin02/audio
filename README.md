@@ -28,7 +28,7 @@ $audio->printSampleInfo();
 
 if ($audio->waveId == "RIFF")
 {
-    $imageSrc = $audio->getVisualization($filename);
+    $imageSrc = $audio->getVisualization();
     print "<img src='$imageSrc' />";
 }
 ```

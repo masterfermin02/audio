@@ -4,7 +4,7 @@ namespace Masterfermin02\Audio;
 
 use Masterfermin02\Audio\ValueObjects\Id3v2;
 
-class Mp3 extends Wave
+class Mp3 extends Wave implements MetaData
 {
     public ?Id3v2 $id3v2;
 
@@ -46,6 +46,7 @@ class Mp3 extends Wave
     public function __construct(
         public readonly File $file,
         public readonly Mp3Info $mp3Info,
+        public readonly PrintBasicInfo $printBasicInfo,
     ) {
         $header = 0;
         $v1tag = 0;
@@ -369,5 +370,56 @@ class Mp3 extends Wave
         $tmp3 = ord($this->file->fRead(1)) & 127;
         $tmp4 = ord($this->file->fRead(1)) & 127;
         return ($tmp * 2_097_152) + ($tmp2 * 16384) + ($tmp3 * 128) + $tmp4;
+    }
+
+    public function printInfo(): void
+    {
+        $this->printBasicInfo->printInfo($this);
+
+        // ID3V1
+        if (isset($this->id3Tag))
+        {
+            print "<tr><td align=right>id3v1-tags</td><td>";
+            print "<table width=100% border=1>";
+            print sprintf('<tr><td width=70 align=right>title</td><td>&nbsp;%s</td></tr>', $this->id3Title);
+            print sprintf('<tr><td align=right>artist</td><td>&nbsp;%s</td></tr>', $this->id3Artist);
+            print sprintf('<tr><td align=right>album</td><td>&nbsp;%s</td></tr>', $this->id3Album);
+            print sprintf('<tr><td align=right>year</td><td>&nbsp;%s</td></tr>', $this->id3Year);
+            print sprintf('<tr><td align=right>comment</td><td>&nbsp;%s</td></tr>', $this->id3Comment);
+            print sprintf('<tr><td align=right>genre</td><td>&nbsp;%s</td></tr>', $this->id3Genre);
+            print "</table>";
+            print "</td></tr>";
+        } else {
+            print "<tr><td align=right>id3v1-tags</td><td>Not found</td></tr>";
+        }
+
+        if (isset($this->id3v2))
+        {
+            print "<tr><td align=right>id3v2-tags</td><td>";
+            print "<table width=100% border=1>";
+            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->id3v2->TIT2."</td></tr>";
+            print "<tr><td align=right>artist</td><td>&nbsp;".$this->id3v2->TPE1."</td></tr>";
+            print "<tr><td align=right>original artist</td><td>&nbsp;".$this->id3v2->TOPE."</td></tr>";
+            print "<tr><td align=right>album</td><td>&nbsp;".$this->id3v2->TALB."</td></tr>";
+            print "<tr><td align=right>year</td><td>&nbsp;".$this->id3v2->TYER."</td></tr>";
+            print "<tr><td align=right>comment</td><td>&nbsp;".$this->id3v2->COMM."</td></tr>";
+            print "<tr><td align=right>composer</td><td>&nbsp;".$this->id3v2->TCOM."</td></tr>";
+            print "<tr><td align=right>genre</td><td>&nbsp;".$this->id3v2->TCON."</td></tr>";
+            print "<tr><td align=right>encoder</td><td>&nbsp;".$this->id3v2->TENC."</td></tr>";
+            print "<tr><td align=right>website</td><td>&nbsp;".$this->id3v2->WXXX."</td></tr>";
+            print "</table>";
+            print "</td></tr>";
+        }
+        else
+        {
+            print "<tr><td align=right>id3v2 tags</td><td>Not found</td></tr>";
+        }
+
+        print "</table>";
+    }
+
+    public function visualize(): void
+    {
+        // TODO: Implement visualize() method.
     }
 }

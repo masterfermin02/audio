@@ -2,7 +2,7 @@
 
 namespace Masterfermin02\Audio;
 
-class Ogg extends Wave
+class Ogg extends Wave implements MetaData
 {
     public $waveId;
     public $waveType;
@@ -27,6 +27,7 @@ class Ogg extends Wave
 
     public function __construct(
         public readonly File $file,
+        public readonly PrintBasicInfo $printBasicInfo,
     ) {
         // Ogg stream?
         $capture_pattern = $this->file->fRead(4);
@@ -230,5 +231,34 @@ class Ogg extends Wave
         $this->version = $this->file->fRead(1);
         //print "Found page ".sprintf('%08b',$type)." ".(ftell($fp)-6)."<br>";
         return ord($this->file->fRead(1));
+    }
+
+    public function printInfo(): void
+    {
+        $this->printBasicInfo->printInfo($this);
+
+        // VORBIS
+        if ($this->id == "OGG")
+        {
+            print "<tr><td align=right>ogg-tags</td><td>";
+            print "<table width=100% border=1>";
+            print "<tr><td width=70 align=right>title</td><td>&nbsp;".$this->vorbisComment['TITLE']."</td></tr>";
+            print "<tr><td align=right>artist</td><td>&nbsp;".$this->vorbisComment['ARTIST']."</td></tr>";
+            print "<tr><td align=right>album</td><td>&nbsp;".$this->vorbisComment['ALBUM']."</td></tr>";
+            print "<tr><td align=right>date</td><td>&nbsp;".$this->vorbisComment['DATE']."</td></tr>";
+            print "<tr><td align=right>genre</td><td>&nbsp;".$this->vorbisComment['GENRE']."</td></tr>";
+            print "<tr><td align=right>comment</td><td>&nbsp;". ($this->vorbisComment['COMMENT'] ?? '')."</td></tr>";
+            print "</table>";
+            print "</td></tr>";
+        } else {
+            print "<tr><td align=right>ogg vorbis info</td><td>Not found</td></tr>";
+        }
+
+        print "</table>";
+    }
+
+    public function visualize(): void
+    {
+        // TODO: Implement visualize() method.
     }
 }
